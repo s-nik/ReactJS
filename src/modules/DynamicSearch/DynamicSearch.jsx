@@ -18,11 +18,17 @@ class DynamicSearch extends React.Component {
     };
 
 render = () => {
-    const {data = []} = this.state;
+    const {data = [], findedIndexes = []} = this.state;
     return <>
     <Input onChange={(e) => {
         this.setState({
-            findedIndexes
+            findedIndexes: data.filter((item)=> {
+                item = item.toLowerCase();
+                if(item.indexOf(e.target.value.toLowerCase()) === 0){
+                    return true;
+                }
+                return false;
+            })
         })
         const finded = data.filter((item) => {
             item = item.toLowerCase();
@@ -30,14 +36,22 @@ render = () => {
                 return true
             } return false
         }); }} />
-    <Button>
+    <Button onClick={(e)=>{
+        this.setState({
+            findedIndexes: []
+        });
+        document.querySelector('Input').value = "";
+    }
+    }>
         X
     </Button>
     <Button>
         Find
     </Button>
         <Block>
-            {data.map((item, i) => {
+            { (findedIndexes.length > 0 ?
+            findedIndexes :
+                data).map((item, i) => {
                 return <Block key={i}>{item}</Block>
             })}
         </Block>
