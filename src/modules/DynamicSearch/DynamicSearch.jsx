@@ -1,63 +1,74 @@
 import React from 'react';
-import Input from 'components/Input'
-import Button from 'components/Button'
-import Block from 'components/Block'
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import Block from '../../components/Block';
 
 class DynamicSearch extends React.Component {
+	state = {
+		data: [
+			'Mariupol',
+			'Kiev',
+			'Los-Angeles',
+			'Moscow',
+			'Berdyansk',
+			'Odessa'
+		],
+		findedIndexes: [],
+	};
 
-    state = {
-        data: [
-            'Mariupol',
-            'Kyiv',
-            'Los-Angeles',
-            'Moscow',
-            'Berdyansk',
-            'Odessa'
-        ],
-        findedIndexes: [],
-    };
+	nodeRef = null;
 
-render = () => {
-    const {data = [], findedIndexes = []} = this.state;
-    return <>
-    <Input onChange={(e) => {
-        this.setState({
-            findedIndexes: data.filter((item)=> {
-                item = item.toLowerCase();
-                if(item.indexOf(e.target.value.toLowerCase()) === 0){
-                    return true;
-                }
-                return false;
-            })
-        })
-        const finded = data.filter((item) => {
-            item = item.toLowerCase();
-            if(data.indexOf(e.target.value.toLowerCase()) === 0){
-                return true
-            } return false
-        }); }} />
-    <Button onClick={(e)=>{
-        this.setState({
-            findedIndexes: []
-        });
-        document.querySelector('Input').value = "";
-    }
-    }>
-        X
-    </Button>
-    <Button>
-        Find
-    </Button>
-        <Block>
-            { (findedIndexes.length > 0 ?
-            findedIndexes :
-                data).map((item, i) => {
-                return <Block key={i}>{item}</Block>
-            })}
-        </Block>
-        </>
-}
+	handleChange = () => {
+		const { data = [] } = this.state;
+		let newValue = '';
+		
+		if (this.nodeRef.value) {
+			newValue = this.nodeRef.value.trim().toLowerCase();
+		}
 
-}
+		this.setState({
+			findedIndexes: newValue.length > 0 ?
+				data.filter((item) => {
+					item = item.trim().toLowerCase();
 
+					if (item.indexOf(newValue) === 0) {
+						return true;
+					}
+					return false;
+				}) :
+				[]
+		});
+	};
+
+	handleClearInput = () => this.setState({
+		findedIndexes: []
+	}, () => {
+		this.nodeRef.value = '';
+	});
+
+	render = () => {
+		const { 
+			// data = [], 
+			findedIndexes = [],
+		} = this.state;
+
+		return <>
+			<Input 
+				ref={(node) => node && (this.nodeRef = node)}
+				onChange={this.handleChange} />
+			<Button
+				onClick={this.handleClearInput}>
+				x
+			</Button>
+			<Button>
+				Find
+			</Button>
+			<Block>
+			{findedIndexes.map((item, i) => {
+				return <Block key={i}>{item}</Block>;
+			})}
+			</Block>
+		</>;
+	};
+};
 export default DynamicSearch;
